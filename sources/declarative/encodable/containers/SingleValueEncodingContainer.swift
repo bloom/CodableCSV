@@ -191,8 +191,10 @@ extension ShadowEncoder.SingleValueContainer {
   mutating func encode(_ value: Decimal) throws {
     switch self._encoder.sink._withUnsafeGuaranteedRef({ $0.configuration.decimalStrategy }) {
     case .locale(let locale):
-      var number = value
-      let string = NSDecimalString(&number, locale)
+      let nf = NumberFormatter()
+      nf.numberStyle = .decimal
+      nf.locale = locale
+      let string = nf.string(from: NSDecimalNumber(decimal: value))
       try self.encode(string)
     case .custom(let closure):
       try closure(value, self._encoder)
